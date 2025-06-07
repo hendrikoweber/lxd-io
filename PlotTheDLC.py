@@ -13,35 +13,37 @@ im = plt.imread(plot_file)
 plt.imshow(im)
 plt.show()
 
-t_ego = recording.get_track(1115)
-t_1 = recording.get_track(1110)
-t_2 = recording.get_track(1109)
-t_3 = recording.get_track(1116)
+t_fields = ['frame', 'x', 'y']
 
-f_ego = t_ego.get_data('frame')
-f_1 = t_1.get_data('frame')
-f_2 = t_2.get_data('frame')
-f_3 = t_3.get_data('frame')
+ego = {}
+ego['track'] = recording.get_track(1115)
+for field in t_fields:
+    ego[field] = ego['track'].get_data(field)
 
-b_1 = np.logical_and(f_1 >= f_ego[0], f_1 <= f_ego[-1])
-b_2 = np.logical_and(f_2 >= f_ego[0], f_2 <= f_ego[-1])
-b_3 = np.logical_and(f_3 >= f_ego[0], f_3 <= f_ego[-1])
+obj_ids = [1110, 1109, 1116]
 
-x_ego = t_ego.get_data('x')
-y_ego = t_ego.get_data('y')
+objs = []
+for id in obj_ids:
+    obj = {}
+    obj['track'] = recording.get_track(id)
+    for field in t_fields:
+        obj[field] = obj['track'].get_data(field)
+        if field == 'frame':
+            b_in = np.logical_and(obj['frame'] >= ego['frame'][0], obj['frame'] <= ego['frame'][-1])
+        obj[field] = obj[field][b_in]
+    objs.append(obj)
 
-x_1= t_1.get_data('x')
-y_1= t_1.get_data('y')
-
-x_2= t_2.get_data('x')
-y_2= t_2.get_data('y')
-
-x_3= t_3.get_data('x')
-y_3= t_3.get_data('y')
-
+step = 50
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=[ '#8080ff', '#ff8080', '#803dc0', '#803dc0'])
-plt.plot(x_ego, y_ego)
-plt.plot(x_1[b_1], y_1[b_1])
-plt.plot(x_2[b_2], y_2[b_2])
-plt.plot(x_3[b_3], y_3[b_3])
+l_e, = plt.plot(ego['x'], ego['y'])
+plt.plot(ego['x'][::step], ego['y'][::step], 'o', color=l_e.get_color(), label='Markers')
+
+for o in objs:
+    l_o, = plt.plot(o['x'], o['y'])
+    plt.plot(o['x'][::step], o['y'][::step], 'o', color=l_o.get_color(), label='Markers')
+
+if ego['track'].get_data('xVelocity')[0] < 0:
+    plt.gca().invert_xaxis()
+    plt.gca().invert_yaxis()
+
 plt.show()
