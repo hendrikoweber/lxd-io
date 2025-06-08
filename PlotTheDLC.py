@@ -33,17 +33,58 @@ for id in obj_ids:
         obj[field] = obj[field][b_in]
     objs.append(obj)
 
-step = 50
+step = 100
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=[ '#8080ff', '#ff8080', '#803dc0', '#803dc0'])
 l_e, = plt.plot(ego['x'], ego['y'])
 plt.plot(ego['x'][::step], ego['y'][::step], 'o', color=l_e.get_color(), label='Markers')
 
-for o in objs:
-    l_o, = plt.plot(o['x'], o['y'])
-    plt.plot(o['x'][::step], o['y'][::step], 'o', color=l_o.get_color(), label='Markers')
+for obj in objs:
+    l_o, = plt.plot(obj['x'], obj['y'])
+    plt.plot(obj['x'][::step], obj['y'][::step], 'o', color=l_o.get_color(), label='Markers')
 
 if ego['track'].get_data('xVelocity')[0] < 0:
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
+
+plt.title('Absolute coordinates')
+
+plt.show()
+
+
+for obj in objs:
+    # To get the matching pieces of the vecotors
+    obj_in_ego = np.logical_and(obj['frame'] >= ego['frame'][0], obj['frame'] <= ego['frame'][-1])
+    ego_in_obj = np.logical_and(ego['frame'] >= obj['frame'][0], ego['frame'] <= obj['frame'][-1])
+
+    # Get the relative coordinates
+    obj['x_rel'] = obj['x'][obj_in_ego] - ego['x'][ego_in_obj]
+    obj['y_rel'] = obj['y'][obj_in_ego] - ego['y'][ego_in_obj]
+
+    obj['x_in_ego'] = obj['x'][obj_in_ego]
+    obj['y_in_ego'] = obj['y'][obj_in_ego]
+
+plt.plot(0,0,'o')
+
+for obj in objs:
+    plt.plot(obj['x_rel'], obj['y_rel'])
+
+if ego['track'].get_data('xVelocity')[0] < 0:
+    plt.gca().invert_xaxis()
+    plt.gca().invert_yaxis()   
+
+plt.title('Relative coordinates')
+
+plt.show()
+
+plt.plot(np.zeros(np.shape(ego['y'])), ego['y'])
+for obj in objs:
+    plt.plot(obj['x_rel'], obj['y_in_ego'])
+
+
+if ego['track'].get_data('xVelocity')[0] < 0:
+    plt.gca().invert_xaxis()
+    plt.gca().invert_yaxis()   
+
+plt.title('x-rel, y-abs')
 
 plt.show()
