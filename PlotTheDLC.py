@@ -6,7 +6,11 @@ dataset_path = "/home/hendrik/data/highD-dataset-v1.0"
 dataset = Dataset(dataset_path)
 recording = dataset.get_recording(12)
 
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=['#803dc0', '#803dc0', '#8080ff', '#ff8080'])  # Custom color list
+C_EGO = '#8080ff'
+C_OBJ = '#ff8080'
+C_OTH = '#803dc0'
+
+plt.rcParams['axes.prop_cycle'] = plt.cycler(color=[C_OTH, C_OTH, C_EGO, C_OBJ])  # Custom color list
 plot_file = recording.plot_track([1009, 1016, 1115, 1110], ".")
 
 im = plt.imread(plot_file)
@@ -34,7 +38,7 @@ for id in obj_ids:
     objs.append(obj)
 
 step = 100
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=[ '#8080ff', '#ff8080', '#803dc0', '#803dc0'])
+plt.rcParams['axes.prop_cycle'] = plt.cycler(color=[C_EGO, C_OBJ, C_OTH, C_OTH])
 l_e, = plt.plot(ego['x'], ego['y'])
 plt.plot(ego['x'][::step], ego['y'][::step], 'o', color=l_e.get_color(), label='Markers')
 
