@@ -192,18 +192,18 @@ class Recording:
         return self._background_image
 
     def plot_track(
-        self, track_id: int | list[int], folder: Path, combine: bool = True
+        self, track_id: int | list[int], folder: Path, combine: bool = True, color=None
     ) -> None:
         if isinstance(track_id, list):
-            return self._plot_multiple_tracks(track_id, folder, combine)
+            return self._plot_multiple_tracks(track_id, folder, combine, color=color)
 
         if isinstance(track_id, int):
-            return self._plot_single_track(track_id, folder)
+            return self._plot_single_track(track_id, folder, color=color)
 
         msg = "track_id must be of type int or list[int]"
         raise TypeError(msg)
 
-    def _plot_single_track(self, track_id: int, folder: Path) -> None:
+    def _plot_single_track(self, track_id: int, folder: Path, color=None) -> None:
         logger.debug(f"Plot recording {self._recording_id}, track {track_id}")
 
         track = self.get_track(track_id)
@@ -227,7 +227,7 @@ class Recording:
         ax.plot(
             background_image_trajectory[:, 0],
             background_image_trajectory[:, 1],
-            color="red",
+            color=color,
             linewidth=2,
         )
         ax.axis("off")
@@ -237,7 +237,7 @@ class Recording:
         return plot_file
 
     def _plot_multiple_tracks(
-        self, track_ids: list, folder: Path, combine_plots: bool
+        self, track_ids: list, folder: Path, combine_plots: bool, color=None
     ) -> None:
         if combine_plots:
             # Plot all trajectories in one image
@@ -269,7 +269,7 @@ class Recording:
                 ax.plot(
                     background_image_trajectory[:, 0],
                     background_image_trajectory[:, 1],
-                    color="red",
+                    color=color,
                     linewidth=2,
                 )
 
